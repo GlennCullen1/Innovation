@@ -7,6 +7,7 @@ public class CellularAut : MonoBehaviour {
 	//Basic Board Variables
 	public float m_BranchChance = 0.25f;
 	public int m_NumItterations = 20;
+	public float  m_AddBranchChance;
 	GameObject[,] m_Board;
 	public GameObject m_BlankCellPrefab;
 	public GameObject m_StartCellPrefab;
@@ -44,7 +45,7 @@ public class CellularAut : MonoBehaviour {
 			}
 			catch(System.Exception e)
 			{
-
+				Debug.Log(e);
 			}
 		}
 	}
@@ -71,11 +72,13 @@ public class CellularAut : MonoBehaviour {
 
 	void ActivateCell(Vector2 cell, Vector2 parentcell)
 	{
-		//replace the cell with working set graphic, add a cell record to it, add it to working set
-		ReplaceCell ((int)cell.x, (int)cell.y, m_WorkingCellPrefab);
-		CellRecord record = m_Board [(int)cell.x, (int)cell.y].AddComponent<CellRecord> ();
-		record.Initialise (parentcell, cell);
-		WorkingSet.Add (cell);
+		if (m_Board [(int)cell.x, (int)cell.y ].GetComponent<CellRecord> () == null) {
+			//replace the cell with working set graphic, add a cell record to it, add it to working set
+			ReplaceCell ((int)cell.x, (int)cell.y, m_WorkingCellPrefab);
+			CellRecord record = m_Board [(int)cell.x, (int)cell.y].AddComponent<CellRecord> ();
+			record.Initialise (parentcell, cell);
+			WorkingSet.Add (cell);
+		}
 	}
 
 	void Itterate()
@@ -145,8 +148,12 @@ public class CellularAut : MonoBehaviour {
 			break;
 		}
 
-		int numberofbranches = Random.Range (1, directions.Count + 1);
+		int numberofbranches = 3;//Random.Range (1, directions.Count + 1);
 		while (numberofbranches >0) {
+			if (Random.Range(0.0f,1.0f) > m_AddBranchChance)
+			{
+				numberofbranches = 0;
+			}
 			direction targetcell  = directions[Random.Range (0,directions.Count)];
 			switch(targetcell) {
 			case direction.North:
@@ -186,6 +193,7 @@ public class CellularAut : MonoBehaviour {
 				numberofbranches --;
 				break;
 			}
+
 		}
 	}
 }
